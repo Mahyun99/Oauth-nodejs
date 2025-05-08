@@ -1,43 +1,42 @@
 import { prismaClient } from '../application/database.js';
-import {v4 as uuid} from "uuid"
 
+// ini juga bisa menjadi function register / login
 const findOrCreateUser = async (request) => {
+    
+
     const userExist = await prismaClient.user.count({
-        where: {googleId: request.googleId}
+        where: {email: request.email}
     })
-
-    const tokens = uuid().toString();
-
+    
     if (userExist === 1) {
         await prismaClient.user.update({
             where: {
-                googleId: request.googleId
+                email: request.email
             },
             data: {
-                token: tokens
+                token: request.token
             }
         })
-        return;
     }
 
-    if (userExist !== 1) {
+    if (!userExist) {
         await prismaClient.user.create({
             data: {
-                googleId: request.id,
+                googleId: request.googleId,
                 email: request.email,
                 name: request.name,
-                token: tokens
+                token: request.token
             }
         })
-        return;
     }
 };
 
 const logout = async (request) => {
 
+    // hapus token di db
     return await prismaClient.user.update({
         where: {
-            id: request
+            googleId: request
         },
         data: {
             token: null

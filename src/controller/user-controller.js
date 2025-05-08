@@ -1,3 +1,11 @@
-export const getUser = (req, res) => {
-    res.send('Success')
+const getUser = (req, res, next) => {
+    try {
+        res.send('Success')
+    } catch (error) {
+        next(error)
+    }
+}
+
+export default {
+    getUser
 }
